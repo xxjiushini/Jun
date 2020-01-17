@@ -92,7 +92,7 @@
         },
         getUser() {
           this.$axios.get('../../static/json/user.json').then(response => {
-            console.log(response.data.object);
+            // console.log(response.data.object);
             this.userList = response.data.object
           }, response => {
             console.log("error");

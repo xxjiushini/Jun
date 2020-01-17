@@ -14,7 +14,6 @@ export default {
 </script>
 
 <style>
-  @import '../static/font-awesome/css/font-awesome.css';
   #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
@@ -44,5 +43,7 @@ export default {
   .container:after,.clearfix:after{
     clear: both;
   }
-
+  html,body,#app{
+    height: 100%;
+  }
 </style>

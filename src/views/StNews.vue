@@ -7,7 +7,7 @@
     <el-main>
       <main class="elmain clearfix">
         <div class="main">
-          <el-button type="primary" @click="pauseCode()">{{count}}<i class="fa fa-pause"></i></el-button>
+          <!--<el-button type="primary" @click="pauseCode()">{{count}}<i class="fa fa-pause"></i></el-button>-->
           <v-stBanner></v-stBanner>
           <ul>
             <li class="main-list" v-for="(value, index) in news" v-bind:key="value.id">
@@ -29,14 +29,14 @@
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0);">
+                    <a href="javascript:void(0);" v-on:click="openNews(index)">
                       <i class="fa fa-commenting"></i>
                       <span>{{value.comment}}</span>
                     </a>
                   </li>
                   <li>
-                    <a href="javascript:void(0);">
-                      <i class="fa fa-heart"></i>
+                    <a href="javascript:void(0);" @click="onLike($event,index)">
+                      <i class="fa fa-heart" :class="{'base-color':value.isLike}"></i>
                       <span>{{value.like}}</span>
                     </a>
                   </li>
@@ -47,7 +47,7 @@
               </a>
             </li>
           </ul>
-          <a  href="javascript:void(0);" class="more">阅读更多</a>
+          <a  href="javascript:void(0);" class="more" ref="more" @click="getData()">阅读更多</a>
         </div>
 
         <div id="divRight">
@@ -72,29 +72,61 @@
       components: {'v-stFooter':StFooter,'v-stBanner':StBanner,'v-stCard':StRightCard},
       data(){
         return{
-          msg:'我是父组件',
           news:null,
           number:null,
+          //计时器变量start
           count: '',
           timer:null,
           flag:true,
+          //计时器变量end
+          test:['1','2','3']
         }
 
       },
+      computed:{
+        //判断是否登录
+        isLogin:function () {
+          return this.$store.getters.getStateFn;
+        }
+      },
       methods:{
+        //打开新闻详情
         openNews(index){
           let routeUrl=this.$router.resolve({ path:'/news',query:{url: '../../static/json/newsList.json'}})
           window.open(routeUrl.href, '_blank');
           this.number=index;
         },
+
+        //获取新闻
         getNews() {
-          this.$axios.get('../../static/json/news.json').then(response => {
-            console.log(response.data.object);
+          let url='';
+          if (this.isLogin) {
+            url = '../../static/json/news.json';
+          } else {
+            url = '../../static/json/unNews.json';
+          }
+          this.$axios.get(url).then(response => {
+            // console.log(response.data.object);
             this.news = response.data.object
           }, response => {
             console.log("error");
           });
         },
+
+
+        //点赞
+        onLike(event,index){
+          let e=event.currentTarget;
+          let number=e.children[1];
+          if (this.news[index].isLike) {
+            number.innerText = number.innerText-1;
+            this.news[index].isLike=false;
+          } else {
+            number.innerText = number.innerText-0+1;
+            this.news[index].isLike=true;
+          }
+        },
+
         //计算
         getComputed(a,b){
           let result=b-a;
@@ -108,6 +140,8 @@
             return "<span style='color: darkblue'>减少了"+(-result)+"</span>"
           }
         },
+
+        //计时器
         getCode(time){
           this.count = time;
           this.timer = setInterval(() => {
@@ -119,6 +153,8 @@
             }
           },1000)
         },
+
+        //暂停计时器
         pauseCode(){
           if (this.flag) {
             clearInterval(this.timer);
@@ -127,10 +163,23 @@
             this.getCode(this.count);
             this.flag = true
           }
+        },
+
+        //测试
+        getData(){
+          this.test.forEach((item,index)=> {
+            // console.log(this.$refs.more[index]);
+          })
+          this.$nextTick(function () {
+            console.log(this.$refs.more);
+            // this.$refs.more.innerText='hello'
+
+          })
+
         }
       },
       created() {
-        this.getCode(5);
+        // this.getCode(5);
       },
       mounted () {
         this.getNews();
@@ -141,7 +190,10 @@
 
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+  .base-color{
+    color: $baseColor;
+  }
   .elmain{
     width: 960px;
     margin: 0 auto;
@@ -172,7 +224,7 @@
     text-decoration: underline;
   }
   .isClick{
-    color: #969696;
+    color: $fontColor;
   }
   .abstract{
     margin: 0 0 8px;
@@ -187,7 +239,7 @@
   }
   .subinfo li{
     float: left;
-    color: #ea6f5a;
+    color: $baseColor;
     margin-right: 16px;
   }
   .subinfo li a{
