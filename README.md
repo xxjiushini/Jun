@@ -2,6 +2,8 @@
 
 > A Vue.js project
 
+基于vue2.0开发的仿简书web项目，包含登录、登出、router配置、VUEX状态管理、axios请求
+
 ## Build Setup
 
 ``` bash
